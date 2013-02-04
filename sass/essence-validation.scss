@@ -1,0 +1,108 @@
+/*
+ * - Essence jQuery Validation Plugin
+ *
+ * - What follows are the default form stylings that get shipped with the Essence jQuery Validation plugin
+ * - Feel free to discard and style as per your project needs.
+ * - Credits: Matthew Burrows <matthew.burrows@essencedigital.com>
+ */
+
+@import "compass/reset";
+@import "compass/css3";
+
+html,
+body{
+	color:#444;
+	font-family:Verdana, Arial, sans-serif;
+	font-size:16px;
+}
+
+form{
+	width:660px;
+	margin:0 auto;
+	div{
+		padding:10px 0;
+	}
+	label{
+		display:block;
+		clear:both;
+		font-size:0.75em;
+		font-weight:400;
+	}
+	input,
+	textarea{
+		padding:5px;
+		background:#fff;
+		@include background-image( linear-gradient( #fff, #ededed ) );
+		border:1px solid #ddd;
+		@include border-radius( 3px );
+		@include box-shadow( rgba( #000, 0.1 ) 0 2px 5px );
+		color:#444;
+		font-family:Verdana, Arial, sans-serif;
+		font-size:0.75em;
+		&[type=submit]{
+			padding:8px 16px;
+			background:#444;
+			@include background-image( linear-gradient( #444, #333 ) );
+			border:1px solid #333;
+			@include box-shadow( inset #444 0 -1px 0 );
+			color:#ededed;
+			font-weight:600;
+			cursor:pointer;
+			&:hover{
+				background:#333;
+				@include background-image( linear-gradient( #333, #444 ) );
+				@include box-shadow( inset #444 0 1px 0 );
+			}
+		}
+	}
+	.error{
+		position:relative;
+		color:red;
+		input,
+		textarea{ border-color:red; }
+		.error-msg{
+			display:block;
+			// -webkit-animation:error-in 1s;
+			// -moz-animation:error-in 1s;
+		}
+	}
+	.error-msg{
+		font-size:0.75em;
+		font-weight:600;
+		display:none;
+		// -webkit-animation:error-out 1s;
+		// -moz-animation:error-out 1s;
+	}
+}
+
+@-webkit-keyframes error-in {
+	to {
+		-webkit-transform:translateY( 12px );
+		display:block;
+		opacity:1;
+	}
+}
+
+@-webkit-keyframes error-out {
+	to {
+		-webkit-transform:translateY( 0px );
+		display:none;
+		opacity:0;
+	}
+}
+
+@-moz-keyframes error-in {
+	to {
+		-moz-transform:translateY( 12px );
+		display:block;
+		opacity:1;
+	}
+}
+
+@-moz-keyframes error-out {
+	to {
+		-moz-transform:translateY( 0px );
+		display:none;
+		opacity:0;
+	}
+}

@@ -1,0 +1,137 @@
+/*
+ * - Essence jQuery Validation Plugin
+ *
+ * - What follows are the default form stylings that get shipped with the Essence jQuery Validation plugin
+ * - Feel free to discard and style as per your project needs.
+ * - Credits: Matthew Burrows <matthew.burrows@essencedigital.com>
+ */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline; }
+
+html {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle; }
+
+q, blockquote {
+  quotes: none; }
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none; }
+
+a img {
+  border: none; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block; }
+
+html, body {
+  color: #444;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 16px; }
+
+form {
+  width: 660px;
+  margin: 0 auto; }
+form div {
+  padding: 10px 0; }
+form label {
+  display: block;
+  clear: both;
+  font-size: 0.75em;
+  font-weight: 400; }
+form input, form textarea {
+  padding: 5px;
+  background: #fff;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #ededed));
+  background-image: -webkit-linear-gradient(#ffffff, #ededed);
+  background-image: -moz-linear-gradient(#ffffff, #ededed);
+  background-image: -o-linear-gradient(#ffffff, #ededed);
+  background-image: linear-gradient(#ffffff, #ededed);
+  border: 1px solid #dddddd;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  color: #444;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 0.75em; }
+form input[type=submit], form textarea[type=submit] {
+  padding: 8px 16px;
+  background: #444;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #444444), color-stop(100%, #333333));
+  background-image: -webkit-linear-gradient(#444444, #333333);
+  background-image: -moz-linear-gradient(#444444, #333333);
+  background-image: -o-linear-gradient(#444444, #333333);
+  background-image: linear-gradient(#444444, #333333);
+  border: 1px solid #333333;
+  -webkit-box-shadow: inset #444444 0 -1px 0;
+  -moz-box-shadow: inset #444444 0 -1px 0;
+  box-shadow: inset #444444 0 -1px 0;
+  color: #ededed;
+  font-weight: 600;
+  cursor: pointer; }
+form input[type=submit]:hover, form textarea[type=submit]:hover {
+  background: #333;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #333333), color-stop(100%, #444444));
+  background-image: -webkit-linear-gradient(#333333, #444444);
+  background-image: -moz-linear-gradient(#333333, #444444);
+  background-image: -o-linear-gradient(#333333, #444444);
+  background-image: linear-gradient(#333333, #444444);
+  -webkit-box-shadow: inset #444444 0 1px 0;
+  -moz-box-shadow: inset #444444 0 1px 0;
+  box-shadow: inset #444444 0 1px 0; }
+form .error {
+  position: relative;
+  color: red; }
+form .error input, form .error textarea {
+  border-color: red; }
+form .error .error-msg {
+  display: block; }
+form .error-msg {
+  font-size: 0.75em;
+  font-weight: 600;
+  display: none; }
+
+@-webkit-keyframes error-in {
+  to {
+    -webkit-transform: translateY(12px);
+    display: block;
+    opacity: 1; } }
+
+@-webkit-keyframes error-out {
+  to {
+    -webkit-transform: translateY(0px);
+    display: none;
+    opacity: 0; } }
+
+@-moz-keyframes error-in {
+  to {
+    -moz-transform: translateY(12px);
+    display: block;
+    opacity: 1; } }
+
+@-moz-keyframes error-out {
+  to {
+    -moz-transform: translateY(0px);
+    display: none;
+    opacity: 0; } }
