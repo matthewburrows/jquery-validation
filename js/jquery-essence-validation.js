@@ -19,48 +19,46 @@
                 _fieldContainer: function ($field) {
                     return $field.closest(self.opts.messageParent);
                 },
-                _buildErrorContainer: function ($field) {
+                _buildContainer: function($field, err){
                     return $('<div>', {
-                        'class': 'error__msg',
-                        'html': $field.data('errorMessage')
+                        'class': err ? self.opts.errorMsgClass : self.opts.successMsgClass,
+                        'html': err ? $field.data('errorMessage') : 'Success!'
                     });
                 },
-                _buildSuccessContainer: function ($field) {
-                    return $('<div>', {
-                        'class': 'success__msg'
-                    });
-                },
-                _msgContainer: function ($field) {
-                    var $container = $field.closest(self.opts.messageParent);
-                    return $container.find('.error__msg');
+                _msgContainer: function ($field, err) {
+                    var $container = $field.closest(self.opts.messageParent),
+                        className = err ? self.opts.errorMsgClass : self.opts.successMsgClass;
+                    return $container.find('.' + className);
                 }
             }
         },
-        _removeFieldMessage: function ($field) {
+        _removeFieldMessage: function ($field, err) {
             var self = this,
-                common = this._getCommonFieldElements();
-            common._fieldContainer($field).removeClass('error');
-            common._msgContainer($field).remove();
+                common = this._getCommonFieldElements(),
+                className = err ? self.opts.errorContainerClass : self.opts.successContainerClass;
+            common._fieldContainer($field).removeClass(className);
+            common._msgContainer($field, err).remove();
         },
-        _showFieldMessage: function ($field) {
+        _showFieldMessage: function ($field, err) {
             var self = this,
-                common = this._getCommonFieldElements();
-            if (!$errorMsg) {
-                var $fieldContainer = common._fieldContainer($field),
-                    $errorMsg = common._msgContainer($field),
-                    $msgContainer = common._buildErrorContainer($field);
-                if (!$fieldContainer.hasClass('error')) {
-                    $fieldContainer.addClass('error').append($msgContainer);
+                common = this._getCommonFieldElements(),
+                className = err ? self.opts.errorContainerClass : self.opts.successContainerClass,
+                $fieldContainer = common._fieldContainer($field),
+                $errorMsg = common._msgContainer($field, err),
+                $msgContainer = common._buildContainer($field, err);
+                if (!$fieldContainer.hasClass(className)) {
+                    $fieldContainer.addClass(className).append($msgContainer);
                 }
-            }
         },
         _textValidation: function ($field, errors) {
             // Run a check to see if the field is empty.
             if ($field.val() === '') {
-                this._showFieldMessage($field);
+                this._removeFieldMessage($field, false);
+                this._showFieldMessage($field, true);
                 return errors += 1;
             } else {
-                this._removeFieldMessage($field);
+                this._removeFieldMessage($field, true);
+                this._showFieldMessage($field, false);
                 return errors;
             }
         },
@@ -69,20 +67,24 @@
                 pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
             // Run a check to see if the field is empty.
             if ($val === '' || !$val.match(pattern)) {
-                this._showFieldMessage($field);
+                this._removeFieldMessage($field, false);
+                this._showFieldMessage($field, true);
                 return errors += 1;
             } else {
-                this._removeFieldMessage($field);
+                this._removeFieldMessage($field, true);
+                this._showFieldMessage($field, false);
                 return errors;
             }
         },
         _radioValidation: function ($field, errors) {
             // Run a check to see if the field has been checked.
             if (!$field.is(':checked')) {
-                this._showFieldMessage($field);
+                this._removeFieldMessage($field, false);
+                this._showFieldMessage($field, true);
                 return errors += 1;
             } else {
-                this._removeFieldMessage($field);
+                this._removeFieldMessage($field, true);
+                this._showFieldMessage($field, false);
                 return errors;
             }
         },
@@ -94,10 +96,12 @@
             var $val = $field.val();
             // Run a check to see if an option has been selected.
             if (!$field.is(':selected') || $val === '') {
-                this._showFieldMessage($field);
+                this._removeFieldMessage($field, false);
+                this._showFieldMessage($field, true);
                 return errors += 1;
             } else {
-                this._removeFieldMessage($field);
+                this._removeFieldMessage($field, true);
+                this._showFieldMessage($field, false);
                 return errors;
             }
         },
@@ -189,6 +193,9 @@
         _mapFormFields: function () {
             var self = this,
                 $fields = this.$element.find(':input'); // Find everything within the form.
+            if(!this.autoComplete){
+                this.$element.prop('autocomplete', 'off');
+            }
             // Loop through the fields.
             $fields.each(function (i, field) {
                 var $this = $(this),
@@ -238,10 +245,15 @@
         }
     });
     $.fn.essenceValidation.defaults = {
+        'autoComplete': false,
         'showMessages': true,
         'defaultMessage': 'Please fill out this field',
         'messageParent': 'div',
         'ajaxSubmission': false,
+        'errorMsgClass': 'error__msg',
+        'successMsgClass': 'success__msg',
+        'errorContainerClass': 'error',
+        'successContainerClass': 'success',
         'submitCallback': function () {
             alert('Form submitted');
         }

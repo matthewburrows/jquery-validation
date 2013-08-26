@@ -55,6 +55,12 @@ form{
 			}
 		}
 	}
+	.success{
+		position:relative;
+		color:green;
+		input,
+		textarea{ border-color:green; }
+	}
 	.error{
 		position:relative;
 		color:red;

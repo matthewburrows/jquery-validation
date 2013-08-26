@@ -63,7 +63,7 @@ form input, form textarea {
   background-image: -moz-linear-gradient(#ffffff, #ededed);
   background-image: -o-linear-gradient(#ffffff, #ededed);
   background-image: linear-gradient(#ffffff, #ededed);
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -83,7 +83,7 @@ form input[type=submit], form textarea[type=submit] {
   background-image: -moz-linear-gradient(#444444, #333333);
   background-image: -o-linear-gradient(#444444, #333333);
   background-image: linear-gradient(#444444, #333333);
-  border: 1px solid #333333;
+  border: 1px solid #333;
   -webkit-box-shadow: inset #444444 0 -1px 0;
   -moz-box-shadow: inset #444444 0 -1px 0;
   box-shadow: inset #444444 0 -1px 0;
@@ -100,6 +100,11 @@ form input[type=submit]:hover, form textarea[type=submit]:hover {
   -webkit-box-shadow: inset #444444 0 1px 0;
   -moz-box-shadow: inset #444444 0 1px 0;
   box-shadow: inset #444444 0 1px 0; }
+form .success {
+  position: relative;
+  color: green; }
+form .success input, form .success textarea {
+  border-color: green; }
 form .error {
   position: relative;
   color: red; }
