@@ -90,7 +90,7 @@
             if ($data.hasOwnProperty('length')) {
                 var length = $data['length'];
                 // Make sure the field value === the data-length value.
-                if (length !== $val.length) {
+                if ($val.length !== length) {
                     return {
                         passed: false,
                         val: $val,
@@ -102,7 +102,7 @@
             // If there is a data-length attribute...
             if ($data.hasOwnProperty('date')) {
                 // Make sure the field is in the correct date format
-                if ($val.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/) == null) {
+                if (null === $val.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/)) {
                     return {
                         passed: false,
                         val: $val,
@@ -161,7 +161,7 @@
             // Check to see if it is an email field.
             if ('email' === type) {
                 var pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                if ('' === $val || $val.match(pattern) === null) {
+                if ('' === $val || null === $val.match(pattern)) {
                     return {
                         passed: false,
                         val: $val,
@@ -215,7 +215,7 @@
             }
 
             // Run the most basic of checks. Make sure the field has a value.
-            if ($val === '') {
+            if ('' === $val) {
                 return {
                     passed: false,
                     val: $val,
