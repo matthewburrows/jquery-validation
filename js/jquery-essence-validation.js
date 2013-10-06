@@ -1,9 +1,4 @@
-/*
- * - jquery-essence-validation.js
- * - (c) 2013 Essence Digital | http://www.essencedigital.com
- *
- * - Credits: Matthew Burrows <matthew.burrows@essencedigital.com>
- */
+/*! jquery-essence-validation.js | (c) 2013 Essence Digital | http://www.essencedigital.com | Credits: Matthew Burrows <matthew.burrows@essencedigital.com> */
 (function ($) {
     // Create a Global namespace to contain all the validation logic.
     var Ess = Ess || {};
@@ -19,144 +14,258 @@
                 _fieldContainer: function ($field) {
                     return $field.closest(self.opts.messageParent);
                 },
-                _buildContainer: function($field, err){
+                _findSibling: function ($field) {
+                    var $parent = this._fieldContainer($field);
+                    if (self.opts.messageSibling) {
+                        return $parent.siblings(self.opts.messageSibling);
+                    }
+                    return false;
+                },
+                _buildContainer: function ($field, err, msg) {
                     return $('<div>', {
-                        'class': err ? self.opts.errorMsgClass : self.opts.successMsgClass,
-                        'html': err ? $field.data('errorMessage') : 'Success!'
+                        'class': 'form__state ' + (err ? self.opts.errorMsgClass : self.opts.successMsgClass),
+                        'html': err ? msg : 'Success!'
                     });
                 },
                 _msgContainer: function ($field, err) {
-                    var $container = $field.closest(self.opts.messageParent),
-                        className = err ? self.opts.errorMsgClass : self.opts.successMsgClass;
-                    return $container.find('.' + className);
+                    var $container = $field.closest(self.opts.messageParent);
+                    return $container.find('.form__state');
                 }
-            }
+            };
         },
         _removeFieldMessage: function ($field, err) {
             var self = this,
                 common = this._getCommonFieldElements(),
-                className = err ? self.opts.errorContainerClass : self.opts.successContainerClass;
-            common._fieldContainer($field).removeClass(className);
-            common._msgContainer($field, err).remove();
+                classes = self.opts.errorContainerClass + ' ' + self.opts.successContainerClass,
+                $fieldContainer = common._fieldContainer($field),
+                $msgContainer = common._msgContainer($field, err),
+                $msgSibling = common._findSibling($field);
+            $fieldContainer.removeClass(classes);
+            $msgContainer.remove();
+            if ($msgSibling) {
+                $msgSibling.removeClass(classes);
+            }
         },
-        _showFieldMessage: function ($field, err) {
+        _showFieldMessage: function ($field, err, msg) {
             var self = this,
                 common = this._getCommonFieldElements(),
                 className = err ? self.opts.errorContainerClass : self.opts.successContainerClass,
                 $fieldContainer = common._fieldContainer($field),
-                $errorMsg = common._msgContainer($field, err),
-                $msgContainer = common._buildContainer($field, err);
-                if (!$fieldContainer.hasClass(className)) {
-                    $fieldContainer.addClass(className).append($msgContainer);
+                $msgContainer = common._buildContainer($field, err, msg),
+                $msgSibling = common._findSibling($field);
+            $fieldContainer
+                .addClass(className)
+                .append($msgContainer);
+            if ($msgSibling) {
+                $msgSibling.addClass(className);
+            }
+        },
+        _fieldValidation: function ($field, errors) {
+            var rules = this._validationRules($field);
+            // Run a check to see if the field is empty.
+            if (!rules.passed) {
+                this._removeFieldMessage($field, false);
+                this._showFieldMessage($field, true, rules.errorMsg);
+                return errors += 1;
+            } else {
+                this._removeFieldMessage($field, true);
+                this._showFieldMessage($field, false);
+                return errors;
+            }
+        },
+        _validationRules: function ($field) {
+            var self = this,
+                type = this._getType($field),
+                $val = $field.val(),
+                $data = $field.data(),
+                $defaultErrorMsg = $data['defaulterror'] || this.opts.defaultMessage;
+
+            // Strips spaces and full stops.
+            if ($data.hasOwnProperty('stripspaces')) {
+                $val = $val.replace(/\s|\./gi, '');
+                $field.val($val);
+            }
+
+            // If there is a data-length attribute...
+            if ($data.hasOwnProperty('length')) {
+                var length = $data['length'];
+                // Make sure the field value === the data-length value.
+                if (length !== $val.length) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['lengtherror'] || $defaultErrorMsg
+                    };
                 }
-        },
-        _textValidation: function ($field, errors) {
-            // Run a check to see if the field is empty.
-            if ($field.val() === '') {
-                this._removeFieldMessage($field, false);
-                this._showFieldMessage($field, true);
-                return errors += 1;
-            } else {
-                this._removeFieldMessage($field, true);
-                this._showFieldMessage($field, false);
-                return errors;
             }
-        },
-        _emailValidation: function ($field, errors) {
-            var $val = $field.val(),
-                pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            // Run a check to see if the field is empty.
-            if ($val === '' || !$val.match(pattern)) {
-                this._removeFieldMessage($field, false);
-                this._showFieldMessage($field, true);
-                return errors += 1;
-            } else {
-                this._removeFieldMessage($field, true);
-                this._showFieldMessage($field, false);
-                return errors;
+
+            // If there is a data-length attribute...
+            if ($data.hasOwnProperty('date')) {
+                // Make sure the field is in the correct date format
+                if ($val.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/) == null) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['dateerror'] || $defaultErrorMsg
+                    };
+                }
             }
-        },
-        _radioValidation: function ($field, errors) {
-            // Run a check to see if the field has been checked.
-            if (!$field.is(':checked')) {
-                this._removeFieldMessage($field, false);
-                this._showFieldMessage($field, true);
-                return errors += 1;
-            } else {
-                this._removeFieldMessage($field, true);
-                this._showFieldMessage($field, false);
-                return errors;
+
+            // If there is a data-match attribute...
+            if ($data.hasOwnProperty('match')) {
+                var $dataMatch = ($data.match) ? $data.match : $field.data('match'),
+                    $match = this.$element.find(':input[name="' + $dataMatch + '"]').val();
+                // Make sure the field value === the data-length value.
+                if ($match.toLowerCase() !== $val.toLowerCase()) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['matcherror'] || $defaultErrorMsg
+                    };
+                }
             }
-        },
-        _checkboxValidation: function ($field, errors) {
-            // To save rewriting code just run the _radioValidation method as we are checking for the same thing.
-            return this._radioValidation($field, errors);
-        },
-        _selectValidation: function ($field, errors) {
-            var $val = $field.val();
-            // Run a check to see if an option has been selected.
-            if (!$field.is(':selected') || $val === '') {
-                this._removeFieldMessage($field, false);
-                this._showFieldMessage($field, true);
-                return errors += 1;
-            } else {
-                this._removeFieldMessage($field, true);
-                this._showFieldMessage($field, false);
-                return errors;
+
+            // If there is a not_numbers attribute...
+            if ($data.hasOwnProperty('not_numbers')) {
+                // Run a check to make sure we are dealing with numbers.
+                if (!isNaN($val)) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['not_numberserror'] || $defaultErrorMsg
+                    };
+                }
             }
+
+            // If there is a data-prefix attribute...
+            if ($data.hasOwnProperty('prefix')) {
+                var $prefix = $data['prefix'];
+                // Make sure the field value is at least as long as the data-prefix length
+                if ($val.length < $prefix.length) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['prefixerror'] || $defaultErrorMsg
+                    };
+                }
+                // Then make sure the field value === the data-prefix value.
+                if ($val.substring(0, $prefix.length) !== $prefix) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $data['prefixerror'] || $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Check to see if it is an email field.
+            if ('email' === type) {
+                var pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                if ('' === $val || $val.match(pattern) === null) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Run a check to see if the field is a radio or checkbox input type.
+            if ('radio' === type || 'checkbox' === type) {
+                if (!$field.is(':checked')) {
+                    return {
+                        passed: false,
+                        val: '',
+                        errorMsg: $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Check to see if it is a select box.
+            if ('select' === type) {
+                if (!$val) {
+                    return {
+                        passed: false,
+                        val: '',
+                        errorMsg: $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Check to see if it is a number input type.
+            if ('number' === type) {
+                if (isNaN(parseFloat($val)) || !isFinite($val)) {
+                    return {
+                        passed: false,
+                        val: '',
+                        errorMsg: $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Check to see if it is a tel input type.
+            if('tel' === type) {
+                if(11 > $val.length || isNaN($val)) {
+                    return {
+                        passed: false,
+                        val: $val,
+                        errorMsg: $defaultErrorMsg
+                    };
+                }
+            }
+
+            // Run the most basic of checks. Make sure the field has a value.
+            if ($val === '') {
+                return {
+                    passed: false,
+                    val: $val,
+                    errorMsg: $defaultErrorMsg
+                };
+            }
+
+            // If we get this far the tests have been passed!
+            return {
+                passed: true,
+                val: $val
+            };
         },
-        _validateFields: function($field, validation){
-            var self = this;
-            // Run a check to see if the field type has a unique validation method.
-            if (self[validation] && typeof self[validation] === 'function') {
-                self[validation]($field, 0);
+        _getType: function ($field) {
+            if ($field) {
+                var $type = $field.data('type') ? $field.data('type') : $field.prop('type');
+                // Because browsers return either 'select-one' or 'select-multiple' for the $field.prop('type')
+                // we need to run a check to make sure that the type contains the word 'select'.
+                if ($type) {
+                    if (-1 !== $type.toLowerCase().indexOf('select')) {
+                        return 'select';
+                    } else {
+                        return $type.toLowerCase();
+                    }
+                }
             }
-            // Else just default to the _textValidation method.
-            else {
-                self._textValidation($field, 0);
-            }
+            return false;
         },
         _validateSubmission: function () {
             var self = this,
                 errors = 0;
             $.each(self.fieldObjects, function (i, val) {
-                var $field = self.$element.find(':input[name="' + val + '"]'),
-                    $type = $field.prop('type'),
-                    validation = '_' + $type + 'Validation';
-                // Run a check to see if the field type has a unique validation method.
-                if (self[validation] && typeof self[validation] === 'function') {
-                    errors = self[validation]($field, errors);
-                }
-                // Else just default to the _textValidation method.
-                else {
-                    errors = self._textValidation($field, errors);
-                }
+                var $field = self.$element.find(':input[name="' + val + '"]');
+                errors = self._fieldValidation($field, errors);
             });
             // If there are errors return true.
             return (errors > 0) ? true : false;
         },
-        _setFieldListeners: function ($field, $name) {
-            var self     = this,
-                changers = ['checkbox', 'radio', 'select'];
+        _setFieldListeners: function ($name) {
+            var self = this,
+                changers = ['checkbox', 'radio', 'select'],
+                $field = this.$element.find(':input[name="' + $name + '"]');
             if ($field) {
-                var $type = $field.prop('type'),
-                    validation = '_' + $type + 'Validation';
-                if($.inArray($type, changers) != -1){
-                    $field.on({
-                        change: function(e){
-                            var $this = $(this);
-                            self._validateFields($this, validation);
-                        }
-                    });
-                }
-                else {
-                    $field.on({
-                        blur: function(e){
-                            var $this = $(this);
-                            self._validateFields($this, validation);
-                        }
-                    })
-                }
+                var $type = this._getType($field),
+                    validation = '_' + $type + 'Validation',
+                    eventType = (-1 !== $.inArray($type, changers)) ? 'change' : 'blur';
+                $field.on(eventType, function (e) {
+                    var $this = $(this);
+                    self._fieldValidation($field, 0);
+                });
             }
         },
         _setSubmissionListener: function () {
@@ -178,36 +287,23 @@
                 }
             });
         },
-        _mapFieldMessage: function (name) {
-            var self = this,
-                $field = this.$element.find(':input[name="' + name + '"]');
-            if (
-                this.overwriteDefaultMessage &&
-                this.overwriteDefaultMessage.hasOwnProperty(name)
-            ) {
-                $field.data('errorMessage', self.overwriteDefaultMessage[name]);
-            } else {
-                $field.data('errorMessage', self.opts.defaultMessage);
-            }
-        },
         _mapFormFields: function () {
             var self = this,
                 $fields = this.$element.find(':input'); // Find everything within the form.
-            if(!this.autoComplete){
+            if (!this.autoComplete) {
                 this.$element.prop('autocomplete', 'off');
             }
             // Loop through the fields.
             $fields.each(function (i, field) {
                 var $this = $(this),
                     $name = $this.prop('name') || false,
-                    $required = $this.data('required') || false;
+                    $required = $this.hasClass('required') || false;
                 // Is the field requried?
                 if ($required) {
                     // Check to see if the $name value exists in the fieldObjects array.
                     if ($name && $.inArray($name, self.fieldObjects) == -1) {
                         self.fieldObjects.push($name);
-                        self._mapFieldMessage($name); // Push the name and a jQuery object of the field to _mapFieldMessage.
-                        self._setFieldListeners($this, $name);
+                        self._setFieldListeners($name);
                     }
                 }
             });
@@ -223,7 +319,6 @@
             this.$element = $(element); // Create a jQuery object of the element.
             this.opts = this._getDefaults(opts); // Merge the default and user specified options.
             this.fieldObjects = []; // Create an array to store the form fields name and a jQuery object of the form.
-            this.overwriteDefaultMessage = (this.opts.hasOwnProperty('overwriteDefaultMessage')) ? this.opts.overwriteDefaultMessage : false;
             // Initiate the function methods.
             this._setSubmissionListener();
             this._mapFormFields();
@@ -249,6 +344,7 @@
         'showMessages': true,
         'defaultMessage': 'Please fill out this field',
         'messageParent': 'div',
+        'messageSibling': false,
         'ajaxSubmission': false,
         'errorMsgClass': 'error__msg',
         'successMsgClass': 'success__msg',
